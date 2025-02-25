@@ -1,0 +1,68 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven 3.8.5'    // Name of your Maven installation in Jenkins
+        jdk 'JDK 11'           // Name of your JDK installation in Jenkins
+    }
+
+    environment {
+        MAVEN_OPTS = "-Xms512m -Xmx1024m"   // JVM options for Maven
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // Clone the repository (assumes Git is configured in Jenkins)
+                checkout scm
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                // Install project dependencies
+                sh 'mvn clean install -DskipTests'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Compile and package the Java application
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                // Execute unit tests
+                sh 'mvn test'
+            }
+        }
+
+        stage('Static Code Analysis') {
+            steps {
+                // Perform static code analysis with tools like SonarQube (if integrated)
+                sh 'mvn sonar:sonar -Dsonar.host.url=http://your-sonarqube-server:9000'
+            }
+        }
+
+        stage('Package and Archive') {
+            steps {
+                // Archive the build artifacts for later use
+                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Build process completed.'
+        }
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed. Please check the logs.'
+        }
+    }
+}
