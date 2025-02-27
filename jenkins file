@@ -6,12 +6,11 @@ pipeline {
     }
 
     environment {
-    MAVEN_HOME = '/opt/maven'  // Update with the correct path
-    PATH = "${MAVEN_HOME}/bin:${env.PATH}"
-}
-
+        MAVEN_HOME = '/opt/maven'  // Update this if needed
+        PATH = "${MAVEN_HOME}/bin:${env.PATH}"
     }
-    stages {
+
+    stages {  // ✅ Make sure this is correctly indented and present
         stage('Code Compilation') {
             steps {
                 echo 'Compiling the code...'
@@ -32,11 +31,9 @@ pipeline {
                 sh 'mvn package'
             }
         }
+
         stage('Java, Git Version') {
-                    steps {
-                        echo 'Version...'
-                        sh 'java --version'
-                        sh 'git --version'
-                    }
-                }
-    }
+            steps {
+                echo 'Checking Java and Git Versions...'
+                sh 'java --version'
+   
