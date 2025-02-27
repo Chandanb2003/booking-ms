@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven 3.8.5'    // Name of your Maven installation in Jenkins
+        maven '3.9.9'    // Name of your Maven installation in Jenkins
         jdk 'JDK 11'           // Name of your JDK installation in Jenkins
     }
 
@@ -17,7 +17,7 @@ pipeline {
                 checkout scm
             }
         }
-        
+
         stage('Install Dependencies') {
             steps {
                 // Install project dependencies
