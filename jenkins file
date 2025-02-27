@@ -5,8 +5,11 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
     }
 
-    tools {
-        maven 'mvn'
+    environment {
+    MAVEN_HOME = '/opt/maven'  // Update with the correct path
+    PATH = "${MAVEN_HOME}/bin:${env.PATH}"
+}
+
     }
     stages {
         stage('Code Compilation') {
