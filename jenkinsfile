@@ -1,68 +1,40 @@
 pipeline {
     agent any
 
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+    }
+
     tools {
-        maven 'Maven 3.8.5'    // Name of your Maven installation in Jenkins
-        jdk 'JDK 11'           // Name of your JDK installation in Jenkins
+        maven 'mvn_3.9.9'
     }
-
-    environment {
-        MAVEN_OPTS = "-Xms512m -Xmx1024m"   // JVM options for Maven
-    }
-
     stages {
-        stage('Checkout Code') {
+        stage('Code Compilation') {
             steps {
-                // Clone the repository (assumes Git is configured in Jenkins)
-                checkout scm
-            }
-        }
-        
-        stage('Install Dependencies') {
-            steps {
-                // Install project dependencies
-                sh 'mvn clean install -DskipTests'
+                echo 'Compiling the code...'
+                sh 'mvn clean compile'
             }
         }
 
-        stage('Build') {
+        stage('JUnit Execution') {
             steps {
-                // Compile and package the Java application
-                sh 'mvn clean package'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                // Execute unit tests
+                echo 'Executing JUnit tests...'
                 sh 'mvn test'
             }
         }
 
-        stage('Static Code Analysis') {
+        stage('Code Packaging') {
             steps {
-                // Perform static code analysis with tools like SonarQube (if integrated)
-                sh 'mvn sonar:sonar -Dsonar.host.url=http://your-sonarqube-server:9000'
+                echo 'Packaging the code...'
+                sh 'mvn package'
             }
         }
-
-        stage('Package and Archive') {
-            steps {
-                // Archive the build artifacts for later use
-                archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Build process completed.'
-        }
-        success {
-            echo 'Build succeeded!'
-        }
-        failure {
-            echo 'Build failed. Please check the logs.'
-        }
+        stage('Java, Git Version') {
+                    steps {
+                        echo 'Version...'
+                        sh 'java --version'
+                        sh 'git --version'
+                    }
+                }
     }
 }
