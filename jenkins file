@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
+    }
+
+    tools {
+        maven 'mvn_3.9.9'
+    }
+    stages {
+        stage('Code Compilation') {
+            steps {
+                echo 'Compiling the code...'
+                sh 'mvn clean compile'
+            }
+        }
+
+        stage('JUnit Execution') {
+            steps {
+                echo 'Executing JUnit tests...'
+                sh 'mvn test'
+            }
+        }
+
+        stage('Code Packaging') {
+            steps {
+                echo 'Packaging the code...'
+                sh 'mvn package'
+            }
+        }
+        stage('Java, Git Version') {
+                    steps {
+                        echo 'Version...'
+                        sh 'java --version'
+                        sh 'git --version'
+                    }
+                }
+    }
+}
