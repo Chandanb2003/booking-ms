@@ -6,7 +6,7 @@ pipeline {
     }
 
     tools {
-        maven 'mvn'
+        maven 'Maven_3.8.4'
     }
     stages {
         stage('Code Compilation') {
