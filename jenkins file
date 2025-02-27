@@ -10,7 +10,7 @@ pipeline {
         PATH = "${MAVEN_HOME}/bin:${env.PATH}"
     }
 
-    stages {  // ✅ Make sure this is correctly indented and present
+    stages {
         stage('Code Compilation') {
             steps {
                 echo 'Compiling the code...'
@@ -36,4 +36,8 @@ pipeline {
             steps {
                 echo 'Checking Java and Git Versions...'
                 sh 'java --version'
-   
+                sh 'git --version'
+            }
+        }
+    }  // ✅ Closing 'stages' block
+}  // ✅ Closing 'pipeline' block (this might have been missing)
