@@ -14,10 +14,17 @@ pipeline {
         stage('Clean Workspace') {
             steps {
                 echo 'Cleaning workspace...'
-                sh 'rm -rf *'  // Removes all files to ensure a fresh start
+                deleteDir() // Jenkins built-in method to clean the workspace
             }
         }
-        
+
+        stage('Checkout Code') {
+            steps {
+                echo 'Checking out code from Git...'
+                checkout scm // Ensure the latest code is fetched after cleanup
+            }
+        }
+
         stage('Code Compilation') {
             steps {
                 echo 'Compiling the code...'
@@ -48,4 +55,3 @@ pipeline {
         }
     }
 }
-
