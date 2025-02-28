@@ -1,51 +1,52 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+pipeline {
+    agent any
 
-    <groupId>com.example</groupId>
-    <artifactId>booking-ms</artifactId>
-    <version>1.1</version>
-    <packaging>jar</packaging>
+    environment {
+        JAVA_HOME = '/usr/lib/jvm/java-21-openjdk-amd64'  // Update path if needed
+        PATH = "${JAVA_HOME}/bin:${env.PATH}"
+    }
 
-    <name>booking-ms</name>
-    <description>Booking Microservice</description>
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning workspace...'
+                deleteDir()
+            }
+        }
 
-    <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+        stage('Checkout Code') {
+            steps {
+                echo 'Checking out code from Git...'
+                checkout scm
+            }
+        }
 
-    <dependencies>
-        <!-- JUnit for testing -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-            <scope>test</scope>
-        </dependency>
+        stage('Verify Java Version') {
+            steps {
+                echo 'Checking Java version...'
+                sh 'java -version'
+            }
+        }
 
-        <!-- Spring Boot Dependencies (If applicable) -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <version>3.2.1</version>
-        </dependency>
-    </dependencies>
+        stage('Code Compilation') {
+            steps {
+                echo 'Compiling the code...'
+                sh 'mvn clean compile'
+            }
+        }
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.11.0</version>
-                <configuration>
-                    <source>21</source>
-                    <target>21</target>
-                    <release>21</release>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
+        stage('JUnit Execution') {
+            steps {
+                echo 'Executing JUnit tests...'
+                sh 'mvn test'
+            }
+        }
+
+        stage('Code Packaging') {
+            steps {
+                echo 'Packaging the code...'
+                sh 'mvn package'
+            }
+        }
+    }
+}
