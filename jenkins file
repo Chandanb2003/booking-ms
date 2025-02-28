@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        JAVA_HOME = '/usr/lib/jvm/java-21-openjdk-amd64'  // Update path if needed
+        JAVA_HOME = '/usr/lib/jvm/java-21-amazon-corretto'  
         PATH = "${JAVA_HOME}/bin:${env.PATH}"
     }
 
@@ -25,6 +25,7 @@ pipeline {
             steps {
                 echo 'Checking Java version...'
                 sh 'java -version'
+                sh 'echo $JAVA_HOME'
             }
         }
 
