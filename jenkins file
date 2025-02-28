@@ -11,6 +11,13 @@ pipeline {
     }
 
     stages {
+        stage('Clean Workspace') {
+            steps {
+                echo 'Cleaning workspace...'
+                sh 'rm -rf *'  // Removes all files to ensure a fresh start
+            }
+        }
+        
         stage('Code Compilation') {
             steps {
                 echo 'Compiling the code...'
@@ -39,5 +46,6 @@ pipeline {
                 sh 'git --version'
             }
         }
-    }  // ✅ Closing 'stages' block
-}  // ✅ Closing 'pipeline' block (this might have been missing)
+    }
+}
+
