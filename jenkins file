@@ -47,3 +47,4 @@ pipeline {
 				sh 'mvn clean package'
 				echo 'WAR Artifact Created Successfully!'
 			}
+}
