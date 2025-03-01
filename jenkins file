@@ -6,51 +6,35 @@ pipeline {
     }
 
     tools {
-        maven 'mvn_3.9.9' // Ensure this is configured in Jenkins Global Tool Configuration
+        maven 'mvn_3.9.9'
     }
-
     stages {
-        stage('Checkout Code') {
-            steps {
-                echo 'Checking out the code...'
-                checkout scm
-            }
-        }
-
-        stage('Java & Git Version Check') {
-            steps {
-                echo 'Checking Java & Git versions...'
-                sh 'java --version'
-                sh 'git --version'
-            }
-        }
-
         stage('Code Compilation') {
             steps {
                 echo 'Compiling the code...'
-                sh 'mvn clean install' // Ensures dependencies are resolved
+                sh 'mvn clean compile'
             }
         }
 
         stage('JUnit Execution') {
             steps {
                 echo 'Executing JUnit tests...'
-                sh 'mvn test || true' // Allows pipeline to continue even if tests fail
+                sh 'mvn test'
             }
         }
 
         stage('Code Packaging') {
             steps {
-                echo 'Packaging the application...'
+                echo 'Packaging the code...'
                 sh 'mvn package'
             }
         }
-
-        stage('Archive Artifacts') {
-            steps {
-                echo 'Archiving build artifacts...'
-                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-            }
-        }
+        stage('Java, Git Version') {
+                    steps {
+                        echo 'Version...'
+                        sh 'java --version'
+                        sh 'git --version'
+                    }
+                }
     }
 }
