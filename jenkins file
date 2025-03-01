@@ -1,40 +1,49 @@
 pipeline {
-    agent any
 
-    options {
-        buildDiscarder(logRotator(numToKeepStr: '5', artifactNumToKeepStr: '5'))
-    }
+	agent any
 
-    tools {
-        maven 'mvn_3.9.9
-    }
-    stages {
-        stage('Code Compilation') {
-            steps {
-                echo 'Compiling the code...'
-                sh 'mvn clean compile'
+	options {
+		buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '3'))
+	}
+
+	tools {
+		maven 'mvn_3.9.9'
+	}
+
+	stages {
+		stage('Code Compilation') {
+			steps {
+				echo 'Starting Code Compilation...'
+				sh 'mvn clean compile'
+				echo 'Code Compilation Completed Successfully!'
+			}
+		}
+		stage('Code QA Execution') {
+			steps {
+				echo 'Running JUnit Test Cases...'
+				sh 'mvn clean test'
+				echo 'JUnit Test Cases Completed Successfully!'
+			}
+		}
+		stage('SonarQube Code Quality') {
+            environment {
+                scannerHome = tool 'qube'
             }
-        }
-
-        stage('JUnit Execution') {
             steps {
-                echo 'Executing JUnit tests...'
-                sh 'mvn test'
-            }
-        }
-
-        stage('Code Packaging') {
-            steps {
-                echo 'Packaging the code...'
-                sh 'mvn package'
-            }
-        }
-        stage('Java, Git Version') {
-                    steps {
-                        echo 'Version...'
-                        sh 'java --version'
-                        sh 'git --version'
-                    }
+                echo 'Starting SonarQube Code Quality Scan...'
+                withSonarQubeEnv('sonar-server') {
+                    sh 'mvn sonar:sonar'
                 }
-    }
-}
+                echo 'SonarQube Scan Completed. Checking Quality Gate...'
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+                echo 'Quality Gate Check Completed!'
+            }
+        }
+		stage('Code Package') {
+			steps {
+				echo 'Creating JAR Artifact...'
+				sh 'mvn clean package'
+				echo 'WAR Artifact Created Successfully!'
+			}
