@@ -51,7 +51,7 @@ pipeline {
 		stage('Build & Tag Docker Image') {
 			steps {
 				echo 'Building Docker Image with Tags...'
-				sh "docker build -t arunrade/booking-ms:latest -t booking-ms:latest ."
+				sh "docker build -t chandan669/sample:v1.1 -t booking-ms:latest ."
 				echo 'Docker Image Build Completed!'
 			}
 		}
@@ -92,10 +92,10 @@ pipeline {
 			steps {
 				script {
 					withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-						sh 'docker login http://43.205.114.241:8085/repository/booking-ms/ -u admin -p ${PASSWORD}'
+						sh 'docker login http://98.81.86.211:8085/repository/booking-ms/ -u admin -p ${PASSWORD}'
 						echo "Push Docker Image to Nexus : In Progress"
-						sh 'docker tag booking-ms 43.205.114.241:8085/booking-ms:latest'
-						sh 'docker push 43.205.114.241:8085/booking-ms'
+						sh 'docker tag booking-ms 98.81.86.211:8085/booking-ms:latest'
+						sh 'docker push 98.81.86.211:8085/booking-ms'
 						echo "Push Docker Image to Nexus : Completed"
 					}
 				}
