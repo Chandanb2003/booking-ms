@@ -81,7 +81,7 @@ pipeline {
 						sh '''
                             docker images
                             docker tag booking-ms:latest 084828560148.dkr.ecr.us-east-1.amazonaws.com/booking-ms:latest
-                            docker push 084828560148.dkr.ecr.ap-south-1.amazonaws.com/booking-ms:latest
+                            docker push 084828560148.dkr.ecr.us-east-1.amazonaws.com/booking-ms:latest
                         '''
 						echo 'Docker Image Pushed to Amazon ECR Successfully!'
 					}
