@@ -51,7 +51,7 @@ pipeline {
 		stage('Build & Tag Docker Image') {
 			steps {
 				echo 'Building Docker Image with Tags...'
-				sh "docker build -t chandan669/sample:v1.1 -t booking-ms:latest ."
+				sh "docker build -t chandan669/jenkins-docker:v1.1 -t booking-ms:latest ."
 				echo 'Docker Image Build Completed!'
 			}
 		}
