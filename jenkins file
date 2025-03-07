@@ -92,10 +92,10 @@ pipeline {
 			steps {
 				script {
 					withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-						sh 'docker login http://3.93.198.78:8081/repository/booking-ms/ -u admin -p ${PASSWORD}'
+						sh 'docker login http://54.80.32.24:8081/repository/booking-ms/ -u admin -p ${PASSWORD}'
 						echo "Push Docker Image to Nexus : In Progress"
-						sh 'docker tag booking-ms 3.93.198.78:8081/booking-ms:latest'
-						sh 'docker push 3.93.198.78:8081/booking-ms'
+						sh 'docker tag booking-ms 54.80.32.24:8081/booking-ms:latest'
+						sh 'docker push 54.80.32.24:8081/booking-ms'
 						echo "Push Docker Image to Nexus : Completed"
 					}
 				}
