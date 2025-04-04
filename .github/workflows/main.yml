@@ -63,18 +63,9 @@ jobs:
 
     - name: Push Docker Image to AWS ECR
       run: |
-        docker tag your-dockerhub-username/booking-ms:${{ github.sha }} your-account-id.dkr.ecr.$AWS_REGION.amazonaws.com/booking-ms:${{ github.sha }}
-        docker push your-account-id.dkr.ecr.$AWS_REGION.amazonaws.com/booking-ms:${{ github.sha }}
+        docker tag chandan669/booking-ms:${{ github.sha }} 084828560148.dkr.ecr.us-east-1.amazonaws.com/booking-ms:${{ github.sha }}
+        docker push 084828560148.dkr.ecr.us-east-1.amazonaws.com/booking-ms:${{ github.sha }}
 
-    - name: Trivy Vulnerability Scan
-      uses: aquasecurity/trivy-action@master
-      with:
-        image-ref: 'your-dockerhub-username/booking-ms:${{ github.sha }}'
-        format: 'table'
-        exit-code: '0'
-        ignore-unfixed: true
-        vuln-type: 'os,library'
-        severity: 'HIGH,CRITICAL'
 
     - name: Deploy to Kubernetes
       run: |
