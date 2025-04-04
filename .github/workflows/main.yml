@@ -48,13 +48,13 @@ jobs:
         echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
     - name: Push Docker Image to DockerHub
-      run: docker push your-dockerhub-username/booking-ms:${{ github.sha }}
+      run: docker push chandan669/booking-ms:${{ github.sha }}
 
     - name: AWS ECR Login
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: 'your-aws-region'
+        AWS_REGION: 'us-east-1'
       run: |
         aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
         aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
