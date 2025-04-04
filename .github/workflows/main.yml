@@ -38,7 +38,7 @@ jobs:
           -Dsonar.login=$SONAR_TOKEN
 
     - name: Build Docker Image
-      run: docker build -t your-dockerhub-username/booking-ms:${{ github.sha }} .
+      run: docker build -t chandan669/booking-ms:${{ github.sha }} .
 
     - name: Log in to DockerHub
       env:
