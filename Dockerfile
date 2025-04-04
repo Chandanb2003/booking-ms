@@ -4,7 +4,14 @@ FROM amazonlinux:2
 # Install dependencies, Java 11, and Maven
 RUN yum update -y && \
     yum install -y git tar wget unzip python3 python3-pip curl openssl && \
-    amazon-linux-extras install java-openjdk11 -y && \
+    RUN curl -s "https://download.oracle.com/java/23/latest/jdk-23_linux-x64_bin.tar.gz" -o jdk.tar.gz && \
+    mkdir -p /usr/lib/jvm && \
+    tar -xzf jdk.tar.gz -C /usr/lib/jvm && \
+    rm jdk.tar.gz && \
+    ln -s /usr/lib/jvm/jdk-23*/bin/java /usr/bin/java && \
+    ln -s /usr/lib/jvm/jdk-23*/bin/javac /usr/bin/javac && \
+    echo 'export JAVA_HOME=/usr/lib/jvm/jdk-23*' >> /etc/profile && \
+    echo 'export PATH=$JAVA_HOME/bin:$PATH' >> /etc/profile
     yum clean all
 
 # Install Maven 3.9.4
