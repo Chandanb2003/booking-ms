@@ -1,17 +1,17 @@
 # Use the Amazon Linux base image
 FROM amazonlinux:2
 
-# Install dependencies, Java 11, and Maven
+# Install dependencies, Java 23, and clean up
 RUN yum update -y && \
     yum install -y git tar wget unzip python3 python3-pip curl openssl && \
-    RUN curl -s "https://download.oracle.com/java/23/latest/jdk-23_linux-x64_bin.tar.gz" -o jdk.tar.gz && \
+    curl -s "https://download.oracle.com/java/23/latest/jdk-23_linux-x64_bin.tar.gz" -o jdk.tar.gz && \
     mkdir -p /usr/lib/jvm && \
     tar -xzf jdk.tar.gz -C /usr/lib/jvm && \
     rm jdk.tar.gz && \
     ln -s /usr/lib/jvm/jdk-23*/bin/java /usr/bin/java && \
     ln -s /usr/lib/jvm/jdk-23*/bin/javac /usr/bin/javac && \
     echo 'export JAVA_HOME=/usr/lib/jvm/jdk-23*' >> /etc/profile && \
-    echo 'export PATH=$JAVA_HOME/bin:$PATH' >> /etc/profile
+    echo 'export PATH=$JAVA_HOME/bin:$PATH' >> /etc/profile && \
     yum clean all
 
 # Install Maven 3.9.4
@@ -20,7 +20,7 @@ RUN cd /opt && \
     tar xvf apache-maven-3.9.4-bin.tar.gz && \
     rm apache-maven-3.9.4-bin.tar.gz
 
-# Set environment variables
+# Set Maven environment variables
 ENV M2_HOME=/opt/apache-maven-3.9.4
 ENV PATH=$M2_HOME/bin:$PATH
 
