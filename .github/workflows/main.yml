@@ -82,10 +82,13 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
-          echo "Deploying updated image to Kubernetes..."
-          sed -i "s|image: .*|image: chandan669/booking-ms:${{ github.sha }}|g" booking-ms-deployment.yaml
-          kubectl apply -f booking-ms-deployment.yaml
+          mkdir -p ~/.kube
+      sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+      sudo chown $(whoami):$(whoami) ~/.kube/config
+      sed -i "s/127.0.0.1/${{ secrets.EC2_HOST }}/g" ~/.kube/config
 
-          - name: Show Web Application URL
-  run: echo "🌐 App should be accessible at: http://${{ secrets.EC2_HOST }}:30007"
+      echo "✅ Kubeconfig configured. Now applying deployment..."
+      kubectl apply -f ~/booking-ms-deployment.yaml
+
+      echo "🌐 App should be accessible at: http://${{ secrets.EC2_HOST }}:30000"
 
