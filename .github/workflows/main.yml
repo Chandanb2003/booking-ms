@@ -66,7 +66,22 @@ jobs:
         docker tag chandan669/booking-ms:${{ github.sha }} 084828560148.dkr.ecr.us-east-1.amazonaws.com/booking-ms:${{ github.sha }}
         docker push 084828560148.dkr.ecr.us-east-1.amazonaws.com/booking-ms:${{ github.sha }}
 
+    - name: Copy Kubernetes YAML to EC2
+      uses: appleboy/scp-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        source: "booking-ms-deployment.yaml"
+        target: "~/"
 
-    - name: Deploy to Kubernetes
-      run: |
-        echo "Deploying to Kubernetes cluster..."
+    - name: Deploy to Kubernetes (K3s on EC2)
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_PRIVATE_KEY }}
+        script: |
+          echo "Deploying updated image to Kubernetes..."
+          sed -i "s|image: .*|image: chandan669/booking-ms:${{ github.sha }}|g" booking-ms-deployment.yaml
+          kubectl apply -f booking-ms-deployment.yaml
