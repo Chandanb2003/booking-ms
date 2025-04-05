@@ -34,7 +34,7 @@ jobs:
       run: |
         mvn sonar:sonar \
           -Dsonar.projectKey=booking-ms \
-          -Dsonar.host.url=http://54.211.124.206:9000 \
+          -Dsonar.host.url=http://3.91.78.41:9000 \
           -Dsonar.login=$SONAR_TOKEN
 
     - name: Build Docker Image
