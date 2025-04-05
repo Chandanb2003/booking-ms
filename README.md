@@ -1,3 +1,3 @@
 JAVA FILE
-test: trigger GitHub Actions
-hey 
+test: trigger GitHub Action
+
