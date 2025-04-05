@@ -85,3 +85,7 @@ jobs:
           echo "Deploying updated image to Kubernetes..."
           sed -i "s|image: .*|image: chandan669/booking-ms:${{ github.sha }}|g" booking-ms-deployment.yaml
           kubectl apply -f booking-ms-deployment.yaml
+
+          - name: Show Web Application URL
+  run: echo "🌐 App should be accessible at: http://${{ secrets.EC2_HOST }}:30007"
+
