@@ -83,12 +83,11 @@ jobs:
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         script: |
           mkdir -p ~/.kube
-      sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
-      sudo chown $(whoami):$(whoami) ~/.kube/config
-      sed -i "s/127.0.0.1/${{ secrets.EC2_HOST }}/g" ~/.kube/config
+          sudo cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+          sudo chown $(whoami):$(whoami) ~/.kube/config
+          sed -i "s/127.0.0.1/${{ secrets.EC2_HOST }}/g" ~/.kube/config
 
-      echo "✅ Kubeconfig configured. Now applying deployment..."
-      kubectl apply -f ~/booking-ms-deployment.yaml
+          echo "✅ Kubeconfig configured. Now applying deployment..."
+          kubectl apply -f ~/booking-ms-deployment.yaml
 
-      echo "🌐 App should be accessible at: http://${{ secrets.EC2_HOST }}:30000"
-
+          echo "🌐 App should be accessible at: http://${{ secrets.EC2_HOST }}:30000"
