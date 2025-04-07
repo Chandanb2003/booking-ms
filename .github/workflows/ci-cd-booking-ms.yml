@@ -25,6 +25,20 @@ jobs:
 
     - name: 🛠️ Build with Maven
       run: mvn clean package
+      
+    - name: Install Docker (if not installed)
+      run: |
+        if ! command -v docker &> /dev/null
+        then
+          echo "Docker not found. Installing..."
+          sudo yum update -y
+          sudo yum install -y docker
+          sudo systemctl start docker
+          sudo systemctl enable docker
+          sudo usermod -aG docker $(whoami)
+        else
+          echo "Docker already installed ✅"
+        fi
 
     - name: 🔐 Log in to Docker Hub
       run: echo "${{ secrets.DOCKERHUB_PASS }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
