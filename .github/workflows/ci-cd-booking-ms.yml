@@ -2,7 +2,8 @@ name: CI/CD - Booking MS 🛳️
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
 
 jobs:
   build-and-deploy:
@@ -18,34 +19,24 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
-    - name: Set up Maven
-      uses: s4u/setup-maven-action@v1
-      with:
-        maven-version: 3.9.5
-
-    # 🍕 NEW: Docker Installation & Group Setup
-    - name: Install Docker (if needed) & Set Permissions
+    - name: Install Maven and Docker (if not installed)
       run: |
-        if ! command -v docker &> /dev/null; then
-          echo "Docker not found. Installing Docker..."
-          sudo yum update -y
-          sudo yum install -y docker
-          sudo systemctl enable docker
-          sudo systemctl start docker
-        else
-          echo "Docker already installed ✅"
-        fi
+        echo "Installing Maven and Docker if not already installed..."
+        sudo yum update -y
+        sudo yum install -y maven docker
 
         echo "Adding $(whoami) to docker group"
         sudo usermod -aG docker $(whoami)
 
-        echo "Granting current shell access to docker group"
+        echo "Starting and enabling Docker"
+        sudo systemctl enable docker
+        sudo systemctl start docker
+
+    - name: Restart Shell to Apply Docker Group (Workaround)
+      run: |
         newgrp docker <<EONG
         docker version
-        EONG
-
-    - name: Verify Docker Access
-      run: docker info
+EONG
 
     - name: Build with Maven
       run: mvn clean package
@@ -58,4 +49,3 @@ jobs:
 
     - name: Push Docker image
       run: docker push chandan669/booking-ms:latest
-
