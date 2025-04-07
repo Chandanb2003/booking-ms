@@ -35,8 +35,8 @@ jobs:
     - name: Restart Shell to Apply Docker Group (Workaround)
       run: |
         newgrp docker <<EONG
-        docker version
-        EONG
+docker version
+EONG
 
     - name: Build with Maven
       run: mvn clean package
