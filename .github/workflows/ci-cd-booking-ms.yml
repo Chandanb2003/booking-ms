@@ -9,42 +9,53 @@ jobs:
     runs-on: self-hosted
 
     steps:
-    - name: 🧾 Checkout Code
+    - name: Checkout Code
       uses: actions/checkout@v3
 
-    - name: ☕ Set up Java 21
+    - name: Set up Java
       uses: actions/setup-java@v3
       with:
         java-version: '21'
         distribution: 'temurin'
 
-    - name: 📦 Install Maven
-      run: |
-        sudo yum update
-        sudo yum install -y maven
+    - name: Set up Maven
+      uses: s4u/setup-maven-action@v1
+      with:
+        maven-version: 3.9.5
 
-    - name: 🛠️ Build with Maven
-      run: mvn clean package
-      
-    - name: Install Docker (if not installed)
+    # 🍕 NEW: Docker Installation & Group Setup
+    - name: Install Docker (if needed) & Set Permissions
       run: |
-        if ! command -v docker &> /dev/null
-        then
-          echo "Docker not found. Installing..."
+        if ! command -v docker &> /dev/null; then
+          echo "Docker not found. Installing Docker..."
           sudo yum update -y
           sudo yum install -y docker
-          sudo systemctl start docker
           sudo systemctl enable docker
-          sudo usermod -aG docker $(whoami)
+          sudo systemctl start docker
         else
           echo "Docker already installed ✅"
         fi
 
-    - name: 🔐 Log in to Docker Hub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        echo "Adding $(whoami) to docker group"
+        sudo usermod -aG docker $(whoami)
 
-    - name: 🐳 Build Docker image
+        echo "Granting current shell access to docker group"
+        newgrp docker <<EONG
+        docker version
+EONG
+
+    - name: Verify Docker Access
+      run: docker info
+
+    - name: Build with Maven
+      run: mvn clean package
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_PASS }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+
+    - name: Build Docker image
       run: docker build -t chandan669/booking-ms:latest .
 
-    - name: 📤 Push Docker image
+    - name: Push Docker image
       run: docker push chandan669/booking-ms:latest
+
