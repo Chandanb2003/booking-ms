@@ -24,10 +24,8 @@ jobs:
         echo "Installing Maven and Docker..."
         sudo yum update -y
         sudo yum install -y maven docker
-
         echo "Adding runner to docker group"
         sudo usermod -aG docker $(whoami)
-
         echo "Enabling and starting Docker"
         sudo systemctl enable docker
         sudo systemctl start docker
@@ -46,3 +44,26 @@ jobs:
 
     - name: Push Docker image
       run: docker push chandan669/booking-ms:latest
+
+    # ✅ NEW — Install K3s on the EC2 Runner
+    - name: Install K3s
+      run: |
+        echo "Installing K3s..."
+        curl -sfL https://get.k3s.io | sh -
+        sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+        echo 'export KUBECONFIG=/etc/rancher/k3s/k3s.yaml' >> ~/.bashrc
+        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
+    # ✅ NEW — Verify K3s cluster is working
+    - name: Verify K3s Cluster
+      run: |
+        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+        kubectl get nodes
+        kubectl get pods -A
+
+    # ✅ NEW — Deploy to K3s (placeholder — need your k8s manifests ready)
+    - name: Deploy to K3s Cluster
+      run: |
+        export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+        kubectl apply -f k8s/
+      continue-on-error: true  # Ignore if k8s folder is not ready yet
