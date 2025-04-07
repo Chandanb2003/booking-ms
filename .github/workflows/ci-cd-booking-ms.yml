@@ -2,7 +2,7 @@ name: CI/CD - Booking MS 🛳️
 
 on:
   push:
-    branches: [main]
+    branches: master
 
 jobs:
   build-and-deploy:
