@@ -42,7 +42,7 @@ jobs:
         echo "Granting current shell access to docker group"
         newgrp docker <<EONG
         docker version
-EONG
+        EONG
 
     - name: Verify Docker Access
       run: docker info
