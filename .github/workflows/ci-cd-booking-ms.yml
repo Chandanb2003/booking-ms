@@ -1,0 +1,30 @@
+name: CI/CD - Booking MS 🛳️
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '21'
+
+    - name: Build with Maven
+      run: mvn clean package
+
+    - name: Log in to Docker Hub
+      run: echo "${{ secrets.DOCKERHUB_PASS }}" | docker login -u "${{ secrets.DOCKERHUB_USER }}" --password-stdin
+
+    - name: Build Docker image
+      run: docker build -t chandan669/booking-ms:latest .
+
+    - name: Push Docker image
+      run: docker push chandan669/booking-ms:latest
