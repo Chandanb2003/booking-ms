@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: booking-ms
+  labels:
+    app: booking-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: booking-ms
+  template:
+    metadata:
+      labels:
+        app: booking-ms
+    spec:
+      containers:
+        - name: booking-ms
+          image: chandan669/booking-ms:latest
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
