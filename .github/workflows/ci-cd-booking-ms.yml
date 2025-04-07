@@ -21,7 +21,7 @@ jobs:
     - name: 📦 Install Maven
       run: |
         sudo yum update
-        sudo yum-get install -y maven
+        sudo yum install -y maven
 
     - name: 🛠️ Build with Maven
       run: mvn clean package
