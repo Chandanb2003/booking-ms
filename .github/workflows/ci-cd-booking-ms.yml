@@ -19,24 +19,21 @@ jobs:
         java-version: '21'
         distribution: 'temurin'
 
-    - name: Install Maven and Docker (if not installed)
+    - name: Install Maven and Docker
       run: |
-        echo "Installing Maven and Docker if not already installed..."
+        echo "Installing Maven and Docker..."
         sudo yum update -y
         sudo yum install -y maven docker
 
-        echo "Adding $(whoami) to docker group"
+        echo "Adding runner to docker group"
         sudo usermod -aG docker $(whoami)
 
-        echo "Starting and enabling Docker"
+        echo "Enabling and starting Docker"
         sudo systemctl enable docker
         sudo systemctl start docker
 
-    - name: Restart Shell to Apply Docker Group (Workaround)
-      run: |
-        newgrp docker <<EONG
-docker version
-EONG
+    - name: Verify Docker Installation
+      run: docker version
 
     - name: Build with Maven
       run: mvn clean package
