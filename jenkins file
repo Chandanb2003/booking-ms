@@ -1,0 +1,117 @@
+pipeline {
+
+	agent any
+
+	options {
+		buildDiscarder(logRotator(numToKeepStr: '3', artifactNumToKeepStr: '3'))
+	}
+
+	tools {
+		maven 'mvn_3.9.9'
+	}
+
+	stages {
+		stage('Code Compilation') {
+			steps {
+				echo 'Starting Code Compilation...'
+				sh 'mvn clean compile'
+				echo 'Code Compilation Completed Successfully!'
+			}
+		}
+		stage('Code QA Execution') {
+			steps {
+				echo 'Running JUnit Test Cases...'
+				sh 'mvn clean test'
+				echo 'JUnit Test Cases Completed Successfully!'
+			}
+		}
+		stage('SonarQube Code Quality') {
+            environment {
+                scannerHome = tool 'qube'
+            }
+            steps {
+                echo 'Starting SonarQube Code Quality Scan...'
+                withSonarQubeEnv('sonar-server') {
+                    sh 'mvn sonar:sonar'
+                }
+                echo 'SonarQube Scan Completed. Checking Quality Gate...'
+                timeout(time: 02, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+                echo 'Quality Gate Check Completed!'
+            }
+        }
+		stage('Code Package') {
+			steps {
+				echo 'Creating JAR Artifact...'
+				sh 'mvn clean package'
+				echo 'WAR Artifact Created Successfully!'
+			}
+		}
+		stage('Build & Tag Docker Image') {
+			steps {
+				echo 'Building Docker Image with Tags...'
+				sh "docker build -t chandan669/jenkins-docker:v1.1 -t booking-ms:latest ."
+				echo 'Docker Image Build Completed!'
+			}
+		}
+		stage('Docker Image Scanning') {
+			steps {
+				echo 'Scanning Docker Image with Trivy...'
+				echo 'Docker Image Scanning Completed!'
+			}
+		}
+		stage('Push Docker Image to Docker Hub') {
+			steps {
+				script {
+					withCredentials([string(credentialsId: 'dockerhubCred', variable: 'dockerhubCred')]) {
+						sh 'docker login docker.io -u chandan669 -p ${dockerhubCred}'
+						echo 'Pushing Docker Image to Docker Hub...'
+						sh 'docker push chandan669/booking-ms:latest'
+						echo 'Docker Image Pushed to Docker Hub Successfully!'
+					}
+				}
+			}
+		}
+		stage('Push Docker Image to Amazon ECR') {
+			steps {
+				script {
+					withDockerRegistry([credentialsId: 'ecr:us-east-1:ecr-credentials', url: "https://084828560148.dkr.ecr.us-east-1.amazonaws.com"]) {
+						echo 'Tagging and Pushing Docker Image to ECR...'
+						sh '''
+                            docker images
+                            docker tag booking-ms:latest 084828560148.dkr.ecr.us-east-1.amazonaws.com/booking-ms:latest
+                            docker push 084828560148.dkr.ecr.us-east-1.amazonaws.com/booking-ms:latest
+                        '''
+						echo 'Docker Image Pushed to Amazon ECR Successfully!'
+					}
+				}
+			}
+		}
+		stage('Upload Docker Image to Nexus') {
+			steps {
+				script {
+					withCredentials([usernamePassword(credentialsId: 'nexus-credentials', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+						sh 'docker login http://54.166.245.127:8085/repository/booking-ms/ -u admin -p ${PASSWORD}'
+						echo "Push Docker Image to Nexus : In Progress"
+						sh 'docker tag booking-ms 54.166.245.127:8085/booking-ms:latest'
+						sh 'docker push 54.166.245.127:8085/booking-ms'
+						echo "Push Docker Image to Nexus : Completed"
+					}
+				}
+			}
+		}
+        stage('Clean Up Local Docker Images') {
+            steps {
+                echo 'Cleaning Up Local Docker Images...'
+                sh '''
+                    docker rmi chandan669/booking-ms:latest || echo "Image not found or already deletedd"
+                    docker rmi booking-ms:latest || echo "Image not found or already deleted"
+                    docker rmi 084828560148.dkr.ecr.us-east-1.amazonaws.com/booking-ms:latest || echo "Image not found or already deleted"
+                    docker image prune -f
+                '''
+                echo 'Local Docker Images Cleaned Up Successfully!'
+            }
+        }
+	}
+}
